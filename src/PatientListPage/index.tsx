@@ -25,7 +25,7 @@ const PatientListPage = () => {
     setError(undefined);
   };
 
-  const submitNewPatient = async (values: PatientFormValues) => {
+  const submitNewPatient = (values: PatientFormValues) => {void (async () => {
     try {
       const { data: newPatient } = await axios.post<Patient>(
         `${apiBaseUrl}/patients`,
@@ -42,7 +42,7 @@ const PatientListPage = () => {
         setError("Unknown error");
       }
     }
-  };
+  })();};
 
   return (
     <div className="App">
