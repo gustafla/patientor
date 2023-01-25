@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { apiBaseUrl } from "./constants";
 import { Patient } from "./types";
-import { useStateValue } from "./state";
+import { useStateValue, updatePatient } from "./state";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
@@ -19,7 +19,7 @@ const PatientPage = () => {
         try {
           console.log('fetching patient details');
           const { data } = await axios.get<Patient>(`${apiBaseUrl}/patients/${id}`);
-          dispatch({ type: "UPDATE_PATIENT", payload: data });
+          dispatch(updatePatient(data));
         } catch (e: unknown) {
           if (axios.isAxiosError(e)) {
             console.error(e?.response?.data || "Unrecognized axios error");
