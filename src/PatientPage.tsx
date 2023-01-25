@@ -1,9 +1,21 @@
 import React, { useEffect } from "react";
 import { apiBaseUrl } from "./constants";
-import { Patient } from "./types";
+import { Patient, Entry } from "./types";
 import { useStateValue, updatePatient } from "./state";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+
+const PatientEntry = ({ entry }: { entry: Entry }) => {
+  return (
+    <div>
+      <p>{entry.date} <i>{entry.description}</i></p>
+      {entry.diagnosisCodes ?
+        (<ul>
+          {entry.diagnosisCodes.map(code => <li key={code}>{code}</li>)}
+        </ul>) : null}
+    </div>
+  );
+};
 
 const PatientPage = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -44,6 +56,10 @@ const PatientPage = () => {
       <p>occupation: {patient.occupation}</p>
       <p>ssn: {patient.ssn}</p>
       <p>date of birth: {patient.dateOfBirth}</p>
+      <h3>entries</h3>
+      {patient.entries ?
+        patient.entries.map(entry => <PatientEntry key={entry.id} entry={entry} />)
+        : null}
     </div>
   );
 };
