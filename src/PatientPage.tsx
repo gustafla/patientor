@@ -1,22 +1,71 @@
 import React, { useEffect } from "react";
 import { apiBaseUrl } from "./constants";
-import { Patient, Entry, Diagnosis } from "./types";
+import { Patient, Entry, Diagnosis, HospitalEntry, OccupationalHealthcareEntry, HealthCheckEntry } from "./types";
 import { useStateValue, updatePatient } from "./state";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+
+const HospitalEntryDetails = ({ entry }: { entry: HospitalEntry }) => {
+  return (
+    <div>
+      <p>Type: hospital entry</p>
+      <p>Discharge: {entry.discharge.date} ({entry.discharge.criteria})</p>
+    </div>
+  );
+};
+
+const OccupationalHealthcareEntryDetails = ({ entry }: { entry: OccupationalHealthcareEntry }) => {
+  return (
+    <div>
+      <p>Type: occupational healthcare entry ({entry.employerName})</p>
+      {entry.sickLeave ? <p>Sick leave {entry.sickLeave.startDate} - {entry.sickLeave.endDate}</p> : null}
+    </div>
+  );
+};
+
+const HealthCheckEntryDetails = ({ entry }: { entry: HealthCheckEntry }) => {
+  return (
+    <div>
+      <p>Type: health check entry</p>
+      <p>Rating: {entry.healthCheckRating}</p>
+    </div>
+  );
+};
 
 const PatientEntry = ({ entry }: { entry: Entry }) => {
   const [{ diagnoses }] = useStateValue();
 
   const diagName = (code: Diagnosis['code']) => diagnoses[code] ? diagnoses[code].name : null;
 
+  const assertNever = (value: never): never => {
+    throw new Error(`Unhandled entry type: ${JSON.stringify(value)}`);
+  };
+
+  let details = null;
+
+  switch (entry.type) {
+    case "Hospital":
+      details = <HospitalEntryDetails entry={entry} />;
+      break;
+    case "OccupationalHealthcare":
+      details = <OccupationalHealthcareEntryDetails entry={entry} />;
+      break;
+    case "HealthCheck":
+      details = <HealthCheckEntryDetails entry={entry} />;
+      break;
+    default:
+      return assertNever(entry);
+  }
+
   return (
-    <div>
+    <div style={{ border: '1px solid black' }}>
       <p>{entry.date} <i>{entry.description}</i></p>
+      {details}
       {entry.diagnosisCodes ?
         (<ul>
           {entry.diagnosisCodes.map(code => <li key={code}>{code} {diagName(code)}</li>)}
         </ul>) : null}
+      <p>diagnose by {entry.specialist}</p>
     </div>
   );
 };
