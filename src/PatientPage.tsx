@@ -1,17 +1,21 @@
 import React, { useEffect } from "react";
 import { apiBaseUrl } from "./constants";
-import { Patient, Entry } from "./types";
+import { Patient, Entry, Diagnosis } from "./types";
 import { useStateValue, updatePatient } from "./state";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const PatientEntry = ({ entry }: { entry: Entry }) => {
+  const [{ diagnoses }] = useStateValue();
+
+  const diagName = (code: Diagnosis['code']) => diagnoses[code] ? diagnoses[code].name : null;
+
   return (
     <div>
       <p>{entry.date} <i>{entry.description}</i></p>
       {entry.diagnosisCodes ?
         (<ul>
-          {entry.diagnosisCodes.map(code => <li key={code}>{code}</li>)}
+          {entry.diagnosisCodes.map(code => <li key={code}>{code} {diagName(code)}</li>)}
         </ul>) : null}
     </div>
   );
