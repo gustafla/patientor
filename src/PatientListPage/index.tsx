@@ -11,6 +11,7 @@ import { useStateValue } from "../state";
 import { TableCell } from "@material-ui/core";
 import { TableRow } from "@material-ui/core";
 import { TableBody } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const PatientListPage = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -25,24 +26,26 @@ const PatientListPage = () => {
     setError(undefined);
   };
 
-  const submitNewPatient = (values: PatientFormValues) => {void (async () => {
-    try {
-      const { data: newPatient } = await axios.post<Patient>(
-        `${apiBaseUrl}/patients`,
-        values
-      );
-      dispatch({ type: "ADD_PATIENT", payload: newPatient });
-      closeModal();
-    } catch (e: unknown) {
-      if (axios.isAxiosError(e)) {
-        console.error(e?.response?.data || "Unrecognized axios error");
-        setError(String(e?.response?.data?.error) || "Unrecognized axios error");
-      } else {
-        console.error("Unknown error", e);
-        setError("Unknown error");
+  const submitNewPatient = (values: PatientFormValues) => {
+    void (async () => {
+      try {
+        const { data: newPatient } = await axios.post<Patient>(
+          `${apiBaseUrl}/patients`,
+          values
+        );
+        dispatch({ type: "ADD_PATIENT", payload: newPatient });
+        closeModal();
+      } catch (e: unknown) {
+        if (axios.isAxiosError(e)) {
+          console.error(e?.response?.data || "Unrecognized axios error");
+          setError(String(e?.response?.data?.error) || "Unrecognized axios error");
+        } else {
+          console.error("Unknown error", e);
+          setError("Unknown error");
+        }
       }
-    }
-  })();};
+    })();
+  };
 
   return (
     <div className="App">
@@ -63,7 +66,7 @@ const PatientListPage = () => {
         <TableBody>
           {Object.values(patients).map((patient: Patient) => (
             <TableRow key={patient.id}>
-              <TableCell>{patient.name}</TableCell>
+              <TableCell><Link to={`/patients/${patient.id}`}>{patient.name}</Link></TableCell>
               <TableCell>{patient.gender}</TableCell>
               <TableCell>{patient.occupation}</TableCell>
               <TableCell>
@@ -82,7 +85,7 @@ const PatientListPage = () => {
       <Button variant="contained" onClick={() => openModal()}>
         Add New Patient
       </Button>
-    </div>
+    </div >
   );
 };
 
