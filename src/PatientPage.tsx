@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { apiBaseUrl } from "./constants";
 import { Patient, Entry, Diagnosis, HospitalEntry, OccupationalHealthcareEntry, HealthCheckEntry } from "./types";
 import { useStateValue, updatePatient, addEntry } from "./state";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import AddEntryForm, { EntryFormValues } from "./AddEntryForm";
+import { Alert } from "@material-ui/lab";
 
 const HospitalEntryDetails = ({ entry }: { entry: HospitalEntry }) => {
   return (
@@ -74,6 +75,7 @@ const PatientEntry = ({ entry }: { entry: Entry }) => {
 const PatientPage = () => {
   const [{ patients }, dispatch] = useStateValue();
   const { id } = useParams();
+  const [error, setError] = useState<string>();
 
   if (id === undefined) {
     return null;
@@ -89,8 +91,10 @@ const PatientPage = () => {
         } catch (e: unknown) {
           if (axios.isAxiosError(e)) {
             console.error(e?.response?.data || "Unrecognized axios error");
+            setError(String(e?.response?.data?.error) || "Unrecognized axios error");
           } else {
             console.error("Unknown error", e);
+            setError("Unknown error");
           }
         }
       }
@@ -114,10 +118,10 @@ const PatientPage = () => {
       } catch (e: unknown) {
         if (axios.isAxiosError(e)) {
           console.error(e?.response?.data || "Unrecognized axios error");
-          //setError(String(e?.response?.data?.error) || "Unrecognized axios error");
+          setError(String(e?.response?.data?.error) || "Unrecognized axios error");
         } else {
           console.error("Unknown error", e);
-          //setError("Unknown error");
+          setError("Unknown error");
         }
       }
     })();
@@ -131,6 +135,7 @@ const PatientPage = () => {
       <p>ssn: {patient.ssn}</p>
       <p>date of birth: {patient.dateOfBirth}</p>
       <h3>add entry</h3>
+      {error && <Alert severity="error">{`Error: ${error}`}</Alert>}
       <AddEntryForm onSubmit={submitNewEntry} />
       <h3>entries</h3>
       {patient.entries ?
