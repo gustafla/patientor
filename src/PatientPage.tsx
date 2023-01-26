@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { apiBaseUrl } from "./constants";
 import { Patient, Entry, Diagnosis, HospitalEntry, OccupationalHealthcareEntry, HealthCheckEntry } from "./types";
-import { useStateValue, updatePatient } from "./state";
+import { useStateValue, updatePatient, addEntry } from "./state";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import AddEntryForm, { EntryFormValues } from "./AddEntryForm";
 
 const HospitalEntryDetails = ({ entry }: { entry: HospitalEntry }) => {
   return (
@@ -102,6 +103,26 @@ const PatientPage = () => {
     return <div>Unknown patient</div>;
   }
 
+  const submitNewEntry = (values: EntryFormValues) => {
+    void (async () => {
+      try {
+        const { data: newEntry } = await axios.post<Entry>(
+          `${apiBaseUrl}/patients/${patient.id}/entries`,
+          values
+        );
+        dispatch(addEntry(patient, newEntry));
+      } catch (e: unknown) {
+        if (axios.isAxiosError(e)) {
+          console.error(e?.response?.data || "Unrecognized axios error");
+          //setError(String(e?.response?.data?.error) || "Unrecognized axios error");
+        } else {
+          console.error("Unknown error", e);
+          //setError("Unknown error");
+        }
+      }
+    })();
+  };
+
   return (
     <div>
       <h2>{patient.name}</h2>
@@ -109,6 +130,8 @@ const PatientPage = () => {
       <p>occupation: {patient.occupation}</p>
       <p>ssn: {patient.ssn}</p>
       <p>date of birth: {patient.dateOfBirth}</p>
+      <h3>add entry</h3>
+      <AddEntryForm onSubmit={submitNewEntry} />
       <h3>entries</h3>
       {patient.entries ?
         patient.entries.map(entry => <PatientEntry key={entry.id} entry={entry} />)

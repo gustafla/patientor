@@ -7,7 +7,7 @@ import {
   TextField as TextFieldMUI,
   Typography,
 } from "@material-ui/core";
-import { Diagnosis, Gender } from "../types";
+import { Diagnosis, Gender } from "./types";
 import { InputLabel } from "@material-ui/core";
 import Input from '@material-ui/core/Input';
 
@@ -69,29 +69,18 @@ export const TextField = ({ field, label, placeholder }: TextProps) => (
 */
 interface NumberProps extends FieldProps {
   label: string;
-  min: number;
-  max: number;
+  placeholder: string;
 }
 
-export const NumberField = ({ field, label, min, max }: NumberProps) => {
-  const [value, setValue] = useState<number>();
-
+export const NumberField = ({ field, label, placeholder }: NumberProps) => {
   return (
     <div style={{ marginBottom: "1em" }}>
       <TextFieldMUI
         fullWidth
         label={label}
-        placeholder={String(min)}
+        placeholder={placeholder}
         type="number"
         {...field}
-        value={value}
-        onChange={(e) => {
-          const value = parseInt(e.target.value);
-          if (value === undefined) return;
-          if (value > max) setValue(max);
-          else if (value <= min) setValue(min);
-          else setValue(Math.floor(value));
-      }}
       />
       <Typography variant="subtitle2" style={{ color: "red" }}>
         <ErrorMessage name={field.name} />
@@ -111,7 +100,7 @@ export const DiagnosisSelection = ({
 }) => {
   const [selectedDiagnoses, setDiagnoses] = useState<string[]>([]);
   const field = "diagnosisCodes";
-  const onChange = (data: string[]) => {    
+  const onChange = (data: string[]) => {
     setDiagnoses([...data]);
     setFieldTouched(field, true);
     setFieldValue(field, selectedDiagnoses);
