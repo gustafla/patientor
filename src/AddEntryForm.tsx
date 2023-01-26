@@ -36,11 +36,11 @@ const AddEntryForm = ({ onSubmit }: Props) => {
         if (!values.specialist) {
           errors.specialist = requiredError;
         }
-        if (!values.healthCheckRating) {
+        if (values.healthCheckRating !== 0 && !values.healthCheckRating) {
           errors.healthCheckRating = requiredError;
         }
         if (values.healthCheckRating < 0 && values.healthCheckRating > 3) {
-          errors.healthCheckRating = requiredError;
+          errors.healthCheckRating = "Value must be a number from 0 to 3";
         }
         return errors;
       }}
